@@ -1,14 +1,13 @@
 package com.lhind.jobportal.controller;
 
-import com.lhind.jobportal.model.dto.ReviewCreateDTO;
 import com.lhind.jobportal.model.dto.ReviewCreateRequestDTO;
+import com.lhind.jobportal.model.dto.ReviewDTO;
 import com.lhind.jobportal.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/reviews")
@@ -28,4 +27,26 @@ public class ReviewController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping
+    public ResponseEntity<Page<ReviewDTO>> getAllReviews(
+            @RequestParam Long jobId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(reviewService.getAllReviewsByJob(jobId, PageRequest.of(page, size)));
+    }
+
+    @GetMapping(path = "/rating/{rating}")
+    public ResponseEntity<Page<ReviewDTO>> getAllReviewsByRating(
+            @RequestParam Long jobId,
+            @PathVariable int rating,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(
+                reviewService.getAllReviewsByRatingAndJob(rating, jobId, PageRequest.of(page, size))
+        );
+    }
+
 }

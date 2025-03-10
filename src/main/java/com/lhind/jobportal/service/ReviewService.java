@@ -1,10 +1,15 @@
 package com.lhind.jobportal.service;
 
+import com.lhind.jobportal.mapper.JobMapper;
 import com.lhind.jobportal.mapper.ReviewMapper;
 import com.lhind.jobportal.model.dto.ReviewCreateDTO;
+import com.lhind.jobportal.model.dto.ReviewDTO;
 import com.lhind.jobportal.model.entity.Review;
 import com.lhind.jobportal.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,5 +31,21 @@ public class ReviewService {
             return true;
         }
         return false;
+    }
+
+    public Page<ReviewDTO> getAllReviewsByRatingAndJob(int rating, Long jobId, Pageable pageable) {
+        return reviewRepository.findAllByRatingAndJob(
+                rating,
+                JobMapper.toEntity(jobService.getJobById(jobId)),
+                pageable
+                )
+                .map(ReviewMapper::toDTO);
+    }
+
+    public Page<ReviewDTO> getAllReviewsByJob(Long jobId, Pageable pageable) {
+        return reviewRepository.findAllByJob(
+                JobMapper.toEntity(jobService.getJobById(jobId)),
+                pageable
+        ).map(ReviewMapper::toDTO);
     }
 }
