@@ -5,6 +5,7 @@ import com.lhind.jobportal.model.dto.JobDTO;
 import com.lhind.jobportal.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +27,9 @@ public class JobController {
         else return ResponseEntity.notFound().build();
     }
 
-    @GetMapping
+    @GetMapping(path = "/employer/{employerId}")
     public ResponseEntity<Page<JobDTO>> getAll(
-            @RequestParam Long employerId,
+            @PathVariable Long employerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(jobService.getAllJobsByEmployerID(employerId, page, size));
@@ -50,4 +51,11 @@ public class JobController {
         return ResponseEntity.ok(jobService.getAllJobsByLocation(location, page, size));
     }
 
+    @GetMapping(path = "/all")
+    public ResponseEntity<Page<JobDTO>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(jobService.getAllJobs(PageRequest.of(page, size)));
+    }
 }
